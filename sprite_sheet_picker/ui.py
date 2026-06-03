@@ -33,11 +33,9 @@ class MATERIAL_PT_sprite_sheet_picker(bpy.types.Panel):
         total = props.columns * props.rows
         max_index = max(0, total - 1)
         layout.label(text="Selected: {} / {}".format(props.sprite_index, max_index))
-        layout.prop(props, "auto_key_on_pick")
 
         buttons = layout.row(align=True)
         buttons.operator("material.sprite_setup_nodes", text="Setup Nodes", icon="NODETREE")
-        buttons.operator("material.sprite_refresh_thumbnails", text="Refresh", icon="FILE_REFRESH")
         buttons.operator("material.sprite_insert_key", text="Insert Key", icon="KEY_HLT")
 
         self.draw_thumbnail_grid(layout, material, props)

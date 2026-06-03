@@ -28,9 +28,8 @@ make ui-smoke
 3. Choose a sprite sheet image.
 4. Set `Cell Width` and `Cell Height`.
 5. Press `Setup Nodes`.
-6. Press `Refresh` if thumbnails are not shown yet.
-7. Pick an image in the `Sprite Cell` thumbnail view to update `Sprite Index`.
-8. Use `Insert Key`, or enable `Auto Key on Pick`, to keyframe `sprite_index`.
+6. Pick an image in the `Sprite Cell` thumbnail view to update `Sprite Index`.
+7. Use `Insert Key` to keyframe `sprite_index`.
 
 The add-on sets keyframe interpolation for `sprite_index` to `CONSTANT`.
 
@@ -44,6 +43,7 @@ Sprite cells are calculated with floor division. For example, a 512 x 512 image 
 - The `Choose Cell` popup contains the page controls and the visible cell choices for the active thumbnail page.
 - Thumbnail caches are cleared automatically when the sprite sheet image, cell size, or page changes. A deferred sync also runs after image/cell changes so the initial preview value is initialized without extra navigation.
 - `sprite_index` is an internal animated property. Users pick cells from the thumbnail view instead of typing index numbers directly.
+- Keyframes are inserted only when `Insert Key` is pressed. Picking a cell does not create keyframes automatically.
 - The shader setup creates or reuses:
   - `SPRITE_SHEET_IMAGE`
   - `SPRITE_SHEET_UV`

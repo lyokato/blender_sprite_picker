@@ -8,12 +8,12 @@ _scheduled_materials = set()
 
 
 def update_image(self, context):
-    sync_settings(self, context, rebuild_previews=True)
+    sync_settings(self, context, rebuild_previews=True, reset_selection=True)
     schedule_preview_sync(self.id_data.name)
 
 
 def update_cell_size(self, context):
-    sync_settings(self, context, rebuild_previews=True)
+    sync_settings(self, context, rebuild_previews=True, reset_selection=True)
     schedule_preview_sync(self.id_data.name)
 
 
@@ -32,10 +32,6 @@ def update_preview_index(self, context):
     index = int(self.preview_index)
     if self.sprite_index != index:
         self.sprite_index = index
-
-    if self.auto_key_on_pick:
-        from . import animation
-        animation.insert_sprite_index_key(context, self.id_data)
 
 
 def preview_index_items(self, context):
@@ -92,7 +88,7 @@ def sync_preview_page_to_sprite_index(settings):
         settings.preview_page = page
 
 
-def sync_settings(settings, context, rebuild_previews=False):
+def sync_settings(settings, context, rebuild_previews=False, reset_selection=False):
     material = settings.id_data
     columns, rows = compute_grid(settings.image, settings.cell_width, settings.cell_height)
 
@@ -101,17 +97,27 @@ def sync_settings(settings, context, rebuild_previews=False):
     if settings.rows != rows:
         settings.rows = rows
 
-    limit = max_index(columns, rows)
-    clamped = clamp(settings.sprite_index, 0, limit)
-    if settings.sprite_index != clamped:
-        settings.sprite_index = clamped
-        return
+    if reset_selection:
+        if settings.preview_page != 0:
+            settings.preview_page = 0
+        if settings.sprite_index != 0:
+            settings.sprite_index = 0
+        else:
+            set_preview_index_without_update(settings, 0)
+    else:
+        limit = max_index(columns, rows)
+        clamped = clamp(settings.sprite_index, 0, limit)
+        if settings.sprite_index != clamped:
+            settings.sprite_index = clamped
 
     if material and material.use_nodes:
         nodes.sync_material_nodes(material)
 
     if rebuild_previews:
-        sync_preview_page_to_sprite_index(settings)
+        if reset_selection:
+            settings.preview_page = 0
+        else:
+            sync_preview_page_to_sprite_index(settings)
         previews.clear_material_previews(material)
         sync_preview_index(settings)
         redraw_properties()
@@ -173,10 +179,6 @@ class SpriteSheetSettings(bpy.types.PropertyGroup):
         name="Rows",
         default=0,
         min=0,
-    )
-    auto_key_on_pick: bpy.props.BoolProperty(
-        name="Auto Key on Pick",
-        default=False,
     )
     preview_page: bpy.props.IntProperty(
         name="Preview Page",

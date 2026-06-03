@@ -37,9 +37,6 @@ class MATERIAL_OT_sprite_select_cell(bpy.types.Operator):
         props = material.sprite_sheet_settings
         props.sprite_index = clamp(self.index, 0, max_index(props.columns, props.rows))
 
-        if props.auto_key_on_pick:
-            animation.insert_sprite_index_key(context, material)
-
         redraw_properties()
         return {"FINISHED"}
 
@@ -163,22 +160,6 @@ class MATERIAL_OT_sprite_insert_key(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class MATERIAL_OT_sprite_refresh_thumbnails(bpy.types.Operator):
-    bl_idname = "material.sprite_refresh_thumbnails"
-    bl_label = "Build/Refresh Thumbnails"
-    bl_options = {"REGISTER"}
-
-    def execute(self, context):
-        material = active_material(context)
-        if not material:
-            self.report({"ERROR"}, "No active material")
-            return {"CANCELLED"}
-
-        previews.clear_material_previews(material)
-        redraw_properties()
-        return {"FINISHED"}
-
-
 class MATERIAL_OT_sprite_step_index(bpy.types.Operator):
     bl_idname = "material.sprite_step_index"
     bl_label = "Step Sprite Index"
@@ -230,7 +211,6 @@ classes = (
     MATERIAL_OT_sprite_select_cell,
     MATERIAL_OT_sprite_pick_cell_popup,
     MATERIAL_OT_sprite_insert_key,
-    MATERIAL_OT_sprite_refresh_thumbnails,
     MATERIAL_OT_sprite_step_index,
     MATERIAL_OT_sprite_set_preview_page,
 )

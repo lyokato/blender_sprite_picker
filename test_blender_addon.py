@@ -56,6 +56,19 @@ def main():
     set_sprite_index_interpolation_constant(material)
     fcurve = next(iter_action_fcurves(material.animation_data.action))
     assert fcurve.keyframe_points[0].interpolation == "CONSTANT"
+    initial_keyframe_count = len(fcurve.keyframe_points)
+
+    bpy.context.view_layer.objects.active.active_material = material
+    bpy.context.scene.frame_set(8)
+    bpy.ops.material.sprite_select_cell(material_name=material.name, index=6)
+    assert props.sprite_index == 6, props.sprite_index
+    assert len(fcurve.keyframe_points) == initial_keyframe_count, len(fcurve.keyframe_points)
+
+    bpy.context.scene.frame_set(12)
+    bpy.ops.material.sprite_insert_key()
+    fcurve = next(iter_action_fcurves(material.animation_data.action))
+    assert len(fcurve.keyframe_points) == initial_keyframe_count + 1, len(fcurve.keyframe_points)
+    assert fcurve.keyframe_points[-1].interpolation == "CONSTANT"
 
     preview_items = previews.get_material_previews(material)
     assert len(preview_items) == 16, len(preview_items)
@@ -94,6 +107,16 @@ def main():
     second_page_items = previews.get_material_previews(paged_material)
     assert len(second_page_items) == 16, len(second_page_items)
     assert second_page_items[0][0] == 256, second_page_items[0]
+
+    paged_props.sprite_index = 15
+    paged_props.preview_page = 1
+    paged_props.cell_width = 256
+    paged_props.cell_height = 256
+    assert paged_props.columns == 2, paged_props.columns
+    assert paged_props.rows == 2, paged_props.rows
+    assert paged_props.sprite_index == 0, paged_props.sprite_index
+    assert paged_props.preview_page == 0, paged_props.preview_page
+    assert paged_props.preview_index == "0", paged_props.preview_index
 
     large_material = bpy.data.materials.new("Large Paged Sprite Test Material")
     large_image = bpy.data.images.new("Large Paged Sprite Test Image", width=1024, height=1024, alpha=True)

@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Sprite Sheet Material Picker",
     "author": "Codex",
-    "version": (0, 1, 21),
+    "version": (0, 1, 23),
     "blender": (4, 5, 0),
     "location": "Properties > Material > Sprite Sheet Picker",
     "description": "Pick cells from a sprite sheet image and drive material UVs by sprite_index.",
