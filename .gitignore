@@ -1,0 +1,28 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Blender temporary and backup files
+*.blend1
+*.blend2
+*.blend@
+*.blend~
+*.blend[0-9]
+*.crash.txt
+
+# Build/distribution artifacts
+*.zip
+dist/
+build/
+
+# Test and smoke-test outputs
+ui_test_output/
+
+# OS/editor noise
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
