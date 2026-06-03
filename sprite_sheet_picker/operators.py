@@ -44,6 +44,109 @@ class MATERIAL_OT_sprite_select_cell(bpy.types.Operator):
         return {"FINISHED"}
 
 
+class MATERIAL_OT_sprite_pick_cell_popup(bpy.types.Operator):
+    bl_idname = "material.sprite_pick_cell_popup"
+    bl_label = "Pick Sprite Cell"
+    bl_options = {"REGISTER"}
+
+    material_name: bpy.props.StringProperty()
+    page: bpy.props.IntProperty(default=-1)
+
+    def invoke(self, context, event):
+        material = material_from_name(self.material_name) or active_material(context)
+        if material:
+            props = material.sprite_sheet_settings
+            columns = min(max(1, props.columns), 6)
+            width = min(max(560, columns * 144 + 72), 980)
+        else:
+            width = 520
+        return context.window_manager.invoke_popup(self, width=width)
+
+    def draw(self, context):
+        material = material_from_name(self.material_name) or active_material(context)
+        layout = self.layout
+        if not material:
+            layout.label(text="Material not found")
+            return
+
+        props = material.sprite_sheet_settings
+        total = props.columns * props.rows
+        if total <= 0:
+            layout.label(text="Set valid sprite sheet image and cell size.")
+            return
+
+        max_page = max(0, (total - 1) // previews.MAX_THUMBNAILS_PER_PAGE)
+        page = clamp(props.preview_page if self.page < 0 else self.page, 0, max_page)
+        start = page * previews.MAX_THUMBNAILS_PER_PAGE
+        end = min(total, start + previews.MAX_THUMBNAILS_PER_PAGE)
+
+        page_row = layout.row(align=True)
+        previous_col = page_row.row(align=True)
+        previous_col.enabled = page > 0
+        previous_col.operator_context = "INVOKE_DEFAULT"
+        previous_page = previous_col.operator(
+            "material.sprite_pick_cell_popup",
+            text="Prev Page",
+            icon="TRIA_LEFT",
+        )
+        previous_page.material_name = material.name
+        previous_page.page = max(0, page - 1)
+
+        page_row.separator(factor=0.8)
+        page_row.label(text="Cells {}-{} of {}".format(start, max(start, end - 1), total))
+        page_row.separator(factor=0.8)
+
+        next_col = page_row.row(align=True)
+        next_col.enabled = page < max_page
+        next_col.operator_context = "INVOKE_DEFAULT"
+        next_page = next_col.operator(
+            "material.sprite_pick_cell_popup",
+            text="Next Page",
+            icon="TRIA_RIGHT",
+        )
+        next_page.material_name = material.name
+        next_page.page = min(max_page, page + 1)
+
+        layout.separator(factor=0.7)
+
+        preview_items = previews.get_material_previews(material, page=page)
+        if not preview_items:
+            layout.label(text="No thumbnails available.")
+            return
+
+        grid_box = layout.box()
+        grid_box.use_property_split = False
+        grid_box.use_property_decorate = False
+        columns = min(max(1, props.columns), 6)
+        grid = grid_box.grid_flow(
+            row_major=True,
+            columns=columns,
+            even_columns=True,
+            even_rows=True,
+            align=True,
+        )
+        grid.operator_context = "EXEC_DEFAULT"
+        for index, icon_id in preview_items:
+            cell = grid.column(align=True)
+            if icon_id:
+                cell.template_icon(icon_value=icon_id, scale=8.0)
+            else:
+                cell.label(text="", icon="IMAGE_DATA")
+
+            op = cell.operator(
+                "material.sprite_select_cell",
+                text="",
+                icon="CHECKMARK" if index == props.sprite_index else "RADIOBUT_OFF",
+                emboss=True,
+                depress=index == props.sprite_index,
+            )
+            op.material_name = material.name
+            op.index = index
+
+    def execute(self, context):
+        return {"FINISHED"}
+
+
 class MATERIAL_OT_sprite_insert_key(bpy.types.Operator):
     bl_idname = "material.sprite_insert_key"
     bl_label = "Insert Key"
@@ -125,6 +228,7 @@ class MATERIAL_OT_sprite_set_preview_page(bpy.types.Operator):
 classes = (
     MATERIAL_OT_sprite_setup_nodes,
     MATERIAL_OT_sprite_select_cell,
+    MATERIAL_OT_sprite_pick_cell_popup,
     MATERIAL_OT_sprite_insert_key,
     MATERIAL_OT_sprite_refresh_thumbnails,
     MATERIAL_OT_sprite_step_index,

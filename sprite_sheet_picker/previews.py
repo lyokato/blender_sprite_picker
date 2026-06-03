@@ -15,10 +15,11 @@ _preview_dirs = {}
 _preview_items = {}
 
 
-def material_cache_key(material):
+def material_cache_key(material, page=None):
     props = material.sprite_sheet_settings
     image = props.image
     image_size = tuple(int(v) for v in image.size) if image else (0, 0)
+    preview_page = props.preview_page if page is None else page
     library = image.library.filepath if image and image.library else ""
     filepath = image.filepath if image else ""
     return (
@@ -29,11 +30,11 @@ def material_cache_key(material):
         props.cell_width,
         props.cell_height,
         library,
-        props.preview_page,
+        preview_page,
     )
 
 
-def get_material_previews(material):
+def get_material_previews(material, page=None):
     props = material.sprite_sheet_settings
     columns, rows = compute_grid(props.image, props.cell_width, props.cell_height)
     if not props.image or columns <= 0 or rows <= 0:
@@ -41,11 +42,11 @@ def get_material_previews(material):
 
     total = columns * rows
     max_page = max(0, (total - 1) // MAX_THUMBNAILS_PER_PAGE)
-    page = max(0, min(props.preview_page, max_page))
-    start = page * MAX_THUMBNAILS_PER_PAGE
+    resolved_page = max(0, min(props.preview_page if page is None else page, max_page))
+    start = resolved_page * MAX_THUMBNAILS_PER_PAGE
     end = min(total, start + MAX_THUMBNAILS_PER_PAGE)
 
-    key = material_cache_key(material)
+    key = material_cache_key(material, resolved_page)
     if key in _preview_items:
         return _preview_items[key]
 
@@ -66,7 +67,7 @@ def get_material_previews(material):
             previews.append((index, 0))
             continue
 
-        name = "cell_{:04d}".format(index)
+        name = "page_{:04d}_cell_{:04d}".format(resolved_page, index)
         path = os.path.join(directory, "{}.png".format(name))
         try:
             save_cell_image(
@@ -79,7 +80,7 @@ def get_material_previews(material):
                 index,
                 path,
             )
-            icon = collection.load(name, path, "IMAGE")
+            icon = collection.load(name, path, "IMAGE", force_reload=True)
             previews.append((index, icon.icon_id))
         except Exception:
             previews.append((index, 0))

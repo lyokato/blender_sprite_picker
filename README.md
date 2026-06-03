@@ -6,9 +6,20 @@ Tested with Blender 4.5 LTS and Blender 5.1.
 
 ## Install
 
-1. Zip the `sprite_sheet_picker` directory, or point Blender at the folder during development.
+1. Run `make dist`, or point Blender at the folder during development.
 2. In Blender, open `Edit > Preferences > Add-ons > Install...`.
-3. Enable `Sprite Sheet Material Picker`.
+3. Install `sprite_sheet_picker.zip`.
+4. Enable `Sprite Sheet Material Picker`.
+
+## Development
+
+```sh
+make dist
+make test
+make ui-smoke
+```
+
+`make test` runs the background add-on tests with Blender 4.5 and 5.1. `make ui-smoke` opens Blender 4.5, creates a test material, shows the Material Properties panel, and saves a screenshot.
 
 ## Basic Workflow
 
@@ -30,7 +41,8 @@ Sprite cells are calculated with floor division. For example, a 512 x 512 image 
 - Thumbnails are generated from Blender image pixels and cached for the active page.
 - Preview display is paged at up to 256 cells per page.
 - The panel uses Blender's icon view for the selected cell preview and tile picker.
-- Thumbnail caches are cleared automatically when the sprite sheet image, cell size, page, or page size changes. A deferred sync also runs after image/cell changes so the initial preview value is initialized without pressing Previous/Next.
+- The `Choose Cell` popup contains the page controls and the visible cell choices for the active thumbnail page.
+- Thumbnail caches are cleared automatically when the sprite sheet image, cell size, or page changes. A deferred sync also runs after image/cell changes so the initial preview value is initialized without extra navigation.
 - `sprite_index` is an internal animated property. Users pick cells from the thumbnail view instead of typing index numbers directly.
 - The shader setup creates or reuses:
   - `SPRITE_SHEET_IMAGE`
@@ -42,7 +54,7 @@ Sprite cells are calculated with floor division. For example, a 512 x 512 image 
 Run this from the project root to open Blender, create a test material, show the Material Properties panel, and save a screenshot:
 
 ```sh
-/Applications/Blender_4_5.app/Contents/MacOS/Blender --factory-startup --python test_blender_ui_smoke.py
+make ui-smoke
 ```
 
 The screenshot is written to `ui_test_output/sprite_sheet_picker_panel.png`.

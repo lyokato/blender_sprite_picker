@@ -40,12 +40,6 @@ class MATERIAL_PT_sprite_sheet_picker(bpy.types.Panel):
         buttons.operator("material.sprite_refresh_thumbnails", text="Refresh", icon="FILE_REFRESH")
         buttons.operator("material.sprite_insert_key", text="Insert Key", icon="KEY_HLT")
 
-        step_buttons = layout.row(align=True)
-        previous_op = step_buttons.operator("material.sprite_step_index", text="Previous", icon="TRIA_LEFT")
-        previous_op.step = -1
-        next_op = step_buttons.operator("material.sprite_step_index", text="Next", icon="TRIA_RIGHT")
-        next_op.step = 1
-
         self.draw_thumbnail_grid(layout, material, props)
 
     def draw_thumbnail_grid(self, layout, material, props):
@@ -56,17 +50,6 @@ class MATERIAL_PT_sprite_sheet_picker(bpy.types.Panel):
         if total <= 0:
             layout.label(text="Set valid cell width and height.")
             return
-
-        max_page = max(0, (total - 1) // previews.MAX_THUMBNAILS_PER_PAGE)
-        page = min(props.preview_page, max_page)
-
-        if max_page > 0:
-            page_row = layout.row(align=True)
-            previous_page = page_row.operator("material.sprite_set_preview_page", text="", icon="TRIA_LEFT")
-            previous_page.step = -1
-            page_row.label(text="Page {} / {}".format(page + 1, max_page + 1))
-            next_page = page_row.operator("material.sprite_set_preview_page", text="", icon="TRIA_RIGHT")
-            next_page.step = 1
 
         preview_items = previews.get_material_previews(material)
         if not preview_items:
@@ -80,10 +63,12 @@ class MATERIAL_PT_sprite_sheet_picker(bpy.types.Panel):
         layout.template_icon_view(
             props,
             "preview_index",
-            show_labels=True,
+            show_labels=False,
             scale=6.0,
-            scale_popup=6.0,
+            scale_popup=1.0,
         )
+        choose_op = layout.operator("material.sprite_pick_cell_popup", text="Choose Cell", icon="IMAGE")
+        choose_op.material_name = material.name
 
 
 classes = (

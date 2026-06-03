@@ -95,6 +95,30 @@ def main():
     assert len(second_page_items) == 16, len(second_page_items)
     assert second_page_items[0][0] == 256, second_page_items[0]
 
+    large_material = bpy.data.materials.new("Large Paged Sprite Test Material")
+    large_image = bpy.data.images.new("Large Paged Sprite Test Image", width=1024, height=1024, alpha=True)
+    large_pixels = [1.0, 1.0, 0.0, 1.0] * (1024 * 1024)
+    large_image.pixels.foreach_set(large_pixels)
+
+    large_props = large_material.sprite_sheet_settings
+    large_props.image = large_image
+    large_props.cell_width = 32
+    large_props.cell_height = 32
+
+    assert large_props.columns == 32, large_props.columns
+    assert large_props.rows == 32, large_props.rows
+
+    large_first_page_items = previews.get_material_previews(large_material, page=0)
+    large_second_page_items = previews.get_material_previews(large_material, page=1)
+    large_last_page_items = previews.get_material_previews(large_material, page=3)
+    assert len(large_first_page_items) == 256, len(large_first_page_items)
+    assert len(large_second_page_items) == 256, len(large_second_page_items)
+    assert len(large_last_page_items) == 256, len(large_last_page_items)
+    assert large_first_page_items[0][0] == 0, large_first_page_items[0]
+    assert large_second_page_items[0][0] == 256, large_second_page_items[0]
+    assert large_last_page_items[0][0] == 768, large_last_page_items[0]
+    assert large_props.preview_page == 0, large_props.preview_page
+
     remainder_material = bpy.data.materials.new("Remainder Sprite Test Material")
     remainder_image = bpy.data.images.new("Remainder Sprite Test Image", width=512, height=512, alpha=True)
     remainder_pixels = [0.0, 0.0, 1.0, 1.0] * (512 * 512)

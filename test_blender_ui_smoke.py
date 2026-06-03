@@ -53,10 +53,6 @@ def setup_scene():
     props.cell_height = 64
     props.sprite_index = 5
 
-    # Emulate the action that used to make the preview appear.
-    bpy.ops.material.sprite_step_index(step=1)
-    bpy.ops.material.sprite_step_index(step=-1)
-
     for area in bpy.context.screen.areas:
         if area.type == "PROPERTIES":
             space = area.spaces.active
