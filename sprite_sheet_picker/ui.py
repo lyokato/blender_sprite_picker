@@ -20,7 +20,9 @@ class MATERIAL_PT_sprite_sheet_picker(bpy.types.Panel):
         material = active_material(context)
         props = material.sprite_sheet_settings
 
-        layout.prop(props, "image")
+        image_row = layout.row(align=True)
+        image_row.prop(props, "image")
+        image_row.operator("material.sprite_open_image", text="", icon="FILE_FOLDER")
 
         cell_row = layout.row(align=True)
         cell_row.prop(props, "cell_width")

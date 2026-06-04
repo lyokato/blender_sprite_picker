@@ -31,6 +31,27 @@ def main():
     assert props.rows == 4, props.rows
     assert len(previews.get_material_previews(material)) == 16
 
+    opened_image = bpy.data.images.new("Opened Sprite Test Image Source", width=32, height=32, alpha=True)
+    opened_image.pixels.foreach_set([0.4, 0.2, 0.8, 1.0] * (32 * 32))
+    opened_path = os.path.join(ROOT, "ui_test_output", "opened_sprite_test.png")
+    os.makedirs(os.path.dirname(opened_path), exist_ok=True)
+    opened_image.file_format = "PNG"
+    opened_image.filepath_raw = opened_path
+    opened_image.save()
+
+    props.sprite_index = 3
+    bpy.context.view_layer.objects.active.active_material = material
+    bpy.ops.material.sprite_open_image(filepath=opened_path)
+    assert props.image.filepath == opened_path, props.image.filepath
+    assert props.sprite_index == 0, props.sprite_index
+    assert props.columns == 2, props.columns
+    assert props.rows == 2, props.rows
+
+    props.image = image
+    props.sprite_index = 5
+    assert props.columns == 4, props.columns
+    assert props.rows == 4, props.rows
+
     nodes.setup_material_nodes(material)
 
     tree = material.node_tree

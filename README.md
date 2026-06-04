@@ -25,7 +25,7 @@ make ui-smoke
 
 1. Select an object with a material.
 2. Open `Properties > Material > Sprite Sheet Picker`.
-3. Choose a sprite sheet image.
+3. Choose a loaded sprite sheet image, or press the folder button to open an image file.
 4. Set `Cell Width` and `Cell Height`.
 5. Press `Setup Nodes`.
 6. Pick an image in the `Sprite Cell` thumbnail view to update `Sprite Index`.
