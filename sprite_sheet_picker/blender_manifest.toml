@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "sprite_sheet_picker"
-version = "1.0.0"
+version = "1.0.1"
 name = "Sprite Sheet Material Picker"
 tagline = "Pick sprite sheet cells and drive material UVs"
 maintainer = "lyokato <lyo.kato@gmail.com>"
