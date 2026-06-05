@@ -1,7 +1,10 @@
+from .utils import PROP_SPRITE_INDEX
+
+
 def insert_sprite_index_key(context, material):
     props = material.sprite_sheet_settings
     props.keyframe_insert(
-        data_path="sprite_index",
+        data_path=PROP_SPRITE_INDEX,
         frame=context.scene.frame_current,
     )
     set_sprite_index_interpolation_constant(material)
@@ -9,7 +12,7 @@ def insert_sprite_index_key(context, material):
 
 def set_sprite_index_interpolation_constant(material):
     props = material.sprite_sheet_settings
-    data_path = props.path_from_id("sprite_index")
+    data_path = props.path_from_id(PROP_SPRITE_INDEX)
     anim = material.animation_data
 
     if not anim or not anim.action:

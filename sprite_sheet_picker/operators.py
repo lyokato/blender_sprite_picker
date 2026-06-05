@@ -2,7 +2,15 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 
 from . import animation, nodes, previews, properties
-from .utils import active_material, clamp, max_index, material_from_name, redraw_properties
+from .utils import (
+    active_material,
+    clamp,
+    grid_total,
+    material_from_name,
+    max_index,
+    max_page,
+    redraw_properties,
+)
 
 
 class MATERIAL_OT_sprite_setup_nodes(bpy.types.Operator):
@@ -96,13 +104,13 @@ class MATERIAL_OT_sprite_pick_cell_popup(bpy.types.Operator):
             return
 
         props = material.sprite_sheet_settings
-        total = props.columns * props.rows
+        total = grid_total(props.columns, props.rows)
         if total <= 0:
             layout.label(text="Set valid sprite sheet image and cell size.")
             return
 
-        max_page = max(0, (total - 1) // previews.MAX_THUMBNAILS_PER_PAGE)
-        page = clamp(props.preview_page if self.page < 0 else self.page, 0, max_page)
+        page_limit = max_page(total, previews.MAX_THUMBNAILS_PER_PAGE)
+        page = clamp(props.preview_page if self.page < 0 else self.page, 0, page_limit)
         start = page * previews.MAX_THUMBNAILS_PER_PAGE
         end = min(total, start + previews.MAX_THUMBNAILS_PER_PAGE)
 
@@ -123,7 +131,7 @@ class MATERIAL_OT_sprite_pick_cell_popup(bpy.types.Operator):
         page_row.separator(factor=0.8)
 
         next_col = page_row.row(align=True)
-        next_col.enabled = page < max_page
+        next_col.enabled = page < page_limit
         next_col.operator_context = "INVOKE_DEFAULT"
         next_page = next_col.operator(
             "material.sprite_pick_cell_popup",
@@ -131,7 +139,7 @@ class MATERIAL_OT_sprite_pick_cell_popup(bpy.types.Operator):
             icon="TRIA_RIGHT",
         )
         next_page.material_name = material.name
-        next_page.page = min(max_page, page + 1)
+        next_page.page = min(page_limit, page + 1)
 
         layout.separator(factor=0.7)
 
@@ -235,9 +243,9 @@ class MATERIAL_OT_sprite_set_preview_page(bpy.types.Operator):
             return {"CANCELLED"}
 
         props = material.sprite_sheet_settings
-        total = props.columns * props.rows
-        max_page = max(0, (total - 1) // previews.MAX_THUMBNAILS_PER_PAGE)
-        props.preview_page = clamp(props.preview_page + self.step, 0, max_page)
+        total = grid_total(props.columns, props.rows)
+        page_limit = max_page(total, previews.MAX_THUMBNAILS_PER_PAGE)
+        props.preview_page = clamp(props.preview_page + self.step, 0, page_limit)
         properties.set_preview_index_for_page(props)
         previews.clear_material_previews(material)
         redraw_properties()

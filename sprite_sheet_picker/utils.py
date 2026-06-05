@@ -1,5 +1,7 @@
 import bpy
 
+PROP_SPRITE_INDEX = "sprite_index"
+
 
 def active_material(context):
     obj = context.object
@@ -26,8 +28,16 @@ def compute_grid(image, cell_width, cell_height):
     return width // cell_width, height // cell_height
 
 
+def grid_total(columns, rows):
+    return columns * rows
+
+
 def max_index(columns, rows):
-    return max(0, (columns * rows) - 1)
+    return max(0, grid_total(columns, rows) - 1)
+
+
+def max_page(total, page_size):
+    return max(0, (total - 1) // page_size)
 
 
 def clamp(value, minimum, maximum):
@@ -39,4 +49,3 @@ def redraw_properties():
         for area in window.screen.areas:
             if area.type == "PROPERTIES":
                 area.tag_redraw()
-

@@ -1,8 +1,15 @@
 import bpy
 
+from .utils import PROP_SPRITE_INDEX
+
 IMAGE_NODE_NAME = "SPRITE_SHEET_IMAGE"
 UV_NODE_NAME = "SPRITE_SHEET_UV"
 UV_GROUP_NAME = "Sprite Sheet UV"
+SOCKET_UV = "UV"
+SOCKET_INDEX = "Index"
+SOCKET_COLUMNS = "Columns"
+SOCKET_ROWS = "Rows"
+SOCKET_VECTOR = "Vector"
 
 
 def setup_material_nodes(material):
@@ -14,8 +21,8 @@ def setup_material_nodes(material):
     uv_node = get_or_create_uv_group_node(tree)
 
     image_node.image = props.image
-    set_socket_default(uv_node, "Columns", max(1, props.columns))
-    set_socket_default(uv_node, "Rows", max(1, props.rows))
+    set_socket_default(uv_node, SOCKET_COLUMNS, max(1, props.columns))
+    set_socket_default(uv_node, SOCKET_ROWS, max(1, props.rows))
 
     setup_index_driver(material, uv_node)
     link_sprite_nodes(tree, image_node, uv_node)
@@ -33,8 +40,8 @@ def sync_material_nodes(material):
     if image_node:
         image_node.image = props.image
     if uv_node:
-        set_socket_default(uv_node, "Columns", max(1, props.columns))
-        set_socket_default(uv_node, "Rows", max(1, props.rows))
+        set_socket_default(uv_node, SOCKET_COLUMNS, max(1, props.columns))
+        set_socket_default(uv_node, SOCKET_ROWS, max(1, props.rows))
 
 
 def get_or_create_image_node(tree):
@@ -66,11 +73,11 @@ def get_or_create_uv_group():
         return group
 
     group = bpy.data.node_groups.new(UV_GROUP_NAME, "ShaderNodeTree")
-    ensure_group_socket(group, "UV", "INPUT", "NodeSocketVector")
-    ensure_group_socket(group, "Index", "INPUT", "NodeSocketFloat")
-    ensure_group_socket(group, "Columns", "INPUT", "NodeSocketFloat")
-    ensure_group_socket(group, "Rows", "INPUT", "NodeSocketFloat")
-    ensure_group_socket(group, "Vector", "OUTPUT", "NodeSocketVector")
+    ensure_group_socket(group, SOCKET_UV, "INPUT", "NodeSocketVector")
+    ensure_group_socket(group, SOCKET_INDEX, "INPUT", "NodeSocketFloat")
+    ensure_group_socket(group, SOCKET_COLUMNS, "INPUT", "NodeSocketFloat")
+    ensure_group_socket(group, SOCKET_ROWS, "INPUT", "NodeSocketFloat")
+    ensure_group_socket(group, SOCKET_VECTOR, "OUTPUT", "NodeSocketVector")
 
     nodes = group.nodes
     links = group.links
@@ -105,32 +112,32 @@ def get_or_create_uv_group():
     multiply_uv = vector_math_node(nodes, "MULTIPLY", "UV * Scale", (170, -210))
     add_uv = vector_math_node(nodes, "ADD", "UV + Offset", (440, -110))
 
-    link(links, group_in.outputs.get("Index"), mod_x.inputs[0])
-    link(links, group_in.outputs.get("Columns"), mod_x.inputs[1])
-    link(links, group_in.outputs.get("Index"), div_y.inputs[0])
-    link(links, group_in.outputs.get("Columns"), div_y.inputs[1])
+    link(links, group_in.outputs.get(SOCKET_INDEX), mod_x.inputs[0])
+    link(links, group_in.outputs.get(SOCKET_COLUMNS), mod_x.inputs[1])
+    link(links, group_in.outputs.get(SOCKET_INDEX), div_y.inputs[0])
+    link(links, group_in.outputs.get(SOCKET_COLUMNS), div_y.inputs[1])
     link(links, div_y.outputs[0], floor_y.inputs[0])
 
     link(links, mod_x.outputs[0], div_offset_x.inputs[0])
-    link(links, group_in.outputs.get("Columns"), div_offset_x.inputs[1])
+    link(links, group_in.outputs.get(SOCKET_COLUMNS), div_offset_x.inputs[1])
     link(links, floor_y.outputs[0], add_row.inputs[0])
     link(links, add_row.outputs[0], div_row.inputs[0])
-    link(links, group_in.outputs.get("Rows"), div_row.inputs[1])
+    link(links, group_in.outputs.get(SOCKET_ROWS), div_row.inputs[1])
     link(links, div_row.outputs[0], sub_offset_y.inputs[1])
 
-    link(links, group_in.outputs.get("Columns"), inv_columns.inputs[1])
-    link(links, group_in.outputs.get("Rows"), inv_rows.inputs[1])
+    link(links, group_in.outputs.get(SOCKET_COLUMNS), inv_columns.inputs[1])
+    link(links, group_in.outputs.get(SOCKET_ROWS), inv_rows.inputs[1])
     link(links, inv_columns.outputs[0], scale_vec.inputs.get("X"))
     link(links, inv_rows.outputs[0], scale_vec.inputs.get("Y"))
 
     link(links, div_offset_x.outputs[0], offset_vec.inputs.get("X"))
     link(links, sub_offset_y.outputs[0], offset_vec.inputs.get("Y"))
 
-    link(links, group_in.outputs.get("UV"), multiply_uv.inputs[0])
-    link(links, scale_vec.outputs.get("Vector"), multiply_uv.inputs[1])
-    link(links, multiply_uv.outputs.get("Vector"), add_uv.inputs[0])
-    link(links, offset_vec.outputs.get("Vector"), add_uv.inputs[1])
-    link(links, add_uv.outputs.get("Vector"), group_out.inputs.get("Vector"))
+    link(links, group_in.outputs.get(SOCKET_UV), multiply_uv.inputs[0])
+    link(links, scale_vec.outputs.get(SOCKET_VECTOR), multiply_uv.inputs[1])
+    link(links, multiply_uv.outputs.get(SOCKET_VECTOR), add_uv.inputs[0])
+    link(links, offset_vec.outputs.get(SOCKET_VECTOR), add_uv.inputs[1])
+    link(links, add_uv.outputs.get(SOCKET_VECTOR), group_out.inputs.get(SOCKET_VECTOR))
 
     return group
 
@@ -140,8 +147,8 @@ def link_sprite_nodes(tree, image_node, uv_node):
     principled = get_or_create_principled(tree)
     output = get_or_create_output(tree)
 
-    ensure_link(tree, texcoord.outputs.get("UV"), uv_node.inputs.get("UV"))
-    ensure_link(tree, uv_node.outputs.get("Vector"), image_node.inputs.get("Vector"))
+    ensure_link(tree, texcoord.outputs.get(SOCKET_UV), uv_node.inputs.get(SOCKET_UV))
+    ensure_link(tree, uv_node.outputs.get(SOCKET_VECTOR), image_node.inputs.get(SOCKET_VECTOR))
     ensure_link(tree, image_node.outputs.get("Color"), principled.inputs.get("Base Color"))
 
     alpha_input = principled.inputs.get("Alpha")
@@ -182,7 +189,7 @@ def get_or_create_output(tree):
 
 
 def setup_index_driver(material, node):
-    socket = node.inputs.get("Index")
+    socket = node.inputs.get(SOCKET_INDEX)
     if not socket:
         return
 
@@ -205,7 +212,7 @@ def setup_index_driver(material, node):
     target = variable.targets[0]
     target.id_type = "MATERIAL"
     target.id = material
-    target.data_path = "sprite_sheet_settings.sprite_index"
+    target.data_path = "sprite_sheet_settings.{}".format(PROP_SPRITE_INDEX)
 
 
 def ensure_group_socket(group, name, direction, socket_type):

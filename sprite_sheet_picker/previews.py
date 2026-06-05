@@ -6,7 +6,7 @@ from array import array
 import bpy
 import bpy.utils.previews
 
-from .utils import compute_grid
+from .utils import compute_grid, grid_total, max_page
 
 MAX_THUMBNAILS_PER_PAGE = 256
 
@@ -40,9 +40,9 @@ def get_material_previews(material, page=None):
     if not props.image or columns <= 0 or rows <= 0:
         return []
 
-    total = columns * rows
-    max_page = max(0, (total - 1) // MAX_THUMBNAILS_PER_PAGE)
-    resolved_page = max(0, min(props.preview_page if page is None else page, max_page))
+    total = grid_total(columns, rows)
+    page_limit = max_page(total, MAX_THUMBNAILS_PER_PAGE)
+    resolved_page = max(0, min(props.preview_page if page is None else page, page_limit))
     start = resolved_page * MAX_THUMBNAILS_PER_PAGE
     end = min(total, start + MAX_THUMBNAILS_PER_PAGE)
 
@@ -195,6 +195,7 @@ def clear_all_previews():
         if os.path.isdir(directory):
             shutil.rmtree(directory, ignore_errors=True)
     _preview_dirs.clear()
+
 
 def register():
     pass

@@ -9,6 +9,7 @@ if ROOT not in sys.path:
 
 import sprite_sheet_picker
 from sprite_sheet_picker import nodes, previews
+from sprite_sheet_picker.utils import PROP_SPRITE_INDEX
 
 
 def main():
@@ -60,8 +61,8 @@ def main():
     assert image_node is not None
     assert uv_node is not None
     assert image_node.image == image
-    assert uv_node.inputs["Columns"].default_value == 4
-    assert uv_node.inputs["Rows"].default_value == 4
+    assert uv_node.inputs[nodes.SOCKET_COLUMNS].default_value == 4
+    assert uv_node.inputs[nodes.SOCKET_ROWS].default_value == 4
 
     driver = None
     for fcurve in tree.animation_data.drivers:
@@ -72,7 +73,7 @@ def main():
     assert driver.variables[0].targets[0].id == material
     assert driver.variables[0].targets[0].data_path == "sprite_sheet_settings.sprite_index"
 
-    props.keyframe_insert(data_path="sprite_index", frame=1)
+    props.keyframe_insert(data_path=PROP_SPRITE_INDEX, frame=1)
     from sprite_sheet_picker.animation import iter_action_fcurves, set_sprite_index_interpolation_constant
     set_sprite_index_interpolation_constant(material)
     fcurve = next(iter_action_fcurves(material.animation_data.action))

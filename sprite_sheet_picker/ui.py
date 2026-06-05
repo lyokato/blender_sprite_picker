@@ -1,7 +1,7 @@
 import bpy
 
 from . import previews, properties
-from .utils import active_material
+from .utils import active_material, grid_total
 
 
 class MATERIAL_PT_sprite_sheet_picker(bpy.types.Panel):
@@ -32,7 +32,7 @@ class MATERIAL_PT_sprite_sheet_picker(bpy.types.Panel):
         grid_info.label(text="Columns: {}".format(props.columns))
         grid_info.label(text="Rows: {}".format(props.rows))
 
-        total = props.columns * props.rows
+        total = grid_total(props.columns, props.rows)
         max_index = max(0, total - 1)
         layout.label(text="Selected: {} / {}".format(props.sprite_index, max_index))
 
@@ -43,7 +43,7 @@ class MATERIAL_PT_sprite_sheet_picker(bpy.types.Panel):
         self.draw_thumbnail_grid(layout, material, props)
 
     def draw_thumbnail_grid(self, layout, material, props):
-        total = props.columns * props.rows
+        total = grid_total(props.columns, props.rows)
         if not props.image:
             layout.label(text="Select a sprite sheet image.")
             return
