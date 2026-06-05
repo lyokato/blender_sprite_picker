@@ -8,12 +8,15 @@ if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
 import sprite_sheet_picker
-from sprite_sheet_picker import nodes, previews
+from sprite_sheet_picker import nodes, operators, previews
 from sprite_sheet_picker.utils import PROP_SPRITE_INDEX
 
 
 def main():
     sprite_sheet_picker.register()
+
+    for operator_class in operators.classes:
+        assert operator_class.bl_description, operator_class.bl_idname
 
     material = bpy.data.materials.new("Sprite Test Material")
     material.use_nodes = True

@@ -4,73 +4,59 @@ Blender material add-on for selecting cells from a sprite sheet image and drivin
 
 Tested with Blender 4.5 LTS and Blender 5.1.
 
-## Install
+https://github.com/user-attachments/assets/cf367699-d7c6-43b8-b086-9cbf3160332d
 
-1. Run `make dist`, or point Blender at the folder during development.
-2. In Blender, open `Edit > Preferences > Add-ons > Install...`.
-3. Install `dist/sprite_sheet_picker-v<version>.zip`.
-4. Enable `Sprite Sheet Material Picker`.
+## Installation
 
-## Development
+Download the zip file from the [releases page](https://github.com/lyokato/blender_sprite_picker/releases), then drag and drop the zip file into Blender to install the add-on.
 
-```sh
-make dist
-make test
-make ui-smoke
-```
 
-`make dist` reads the add-on version from `sprite_sheet_picker/__init__.py` and writes a versioned zip such as `dist/sprite_sheet_picker-v1.0.0.zip`.
+<img width="960" height="720" alt="install_addon" src="https://github.com/user-attachments/assets/7af4144b-fb82-4f38-825c-0bdd783106a2" />
 
-`make test` runs the background add-on tests with Blender 4.5 and 5.1. `make ui-smoke` opens Blender 4.5, creates a test material, shows the Material Properties panel, and saves a screenshot.
+Open `Edit > Preferences > Add-ons`, then enable **Sprite Sheet Material Picker**.
 
-## Release
+## Usage
 
-1. Update `bl_info["version"]` in `sprite_sheet_picker/__init__.py`.
-2. Update `CHANGELOG.md`.
-3. Commit the version bump and changelog.
-4. Create and push a matching tag:
+<img width="960" height="602" alt="material_setting_panel" src="https://github.com/user-attachments/assets/547cd1d4-338b-4453-a989-023cbc51046b" />
 
-```sh
-git tag v1.0.0
-git push origin main --tags
-```
+Create or select a mesh, then create a material for it. When the material is selected, a **Sprite Sheet Picker** panel appears in the Material properties.
 
-Pushing a tag like `v1.0.0` runs the release workflow. GitHub creates a release for that tag and attaches the versioned zip from `make dist`.
+<img width="960" height="494" alt="pick_sprite_texture" src="https://github.com/user-attachments/assets/a1cc0c0f-7f13-4fe3-843a-f3858d24eba1" />
 
-## Basic Workflow
+1. Click the folder icon in the panel, then choose the image you want to use as a sprite sheet.
 
-1. Select an object with a material.
-2. Open `Properties > Material > Sprite Sheet Picker`.
-3. Choose a loaded sprite sheet image, or press the folder button to open an image file.
-4. Set `Cell Width` and `Cell Height`.
-5. Press `Setup Nodes`.
-6. Pick an image in the `Sprite Cell` thumbnail view to update `Sprite Index`.
-7. Use `Insert Key` to keyframe `sprite_index`.
+2. Enter the size of one sprite cell in **Cell Width** and **Cell Height**. In this example, the image is 1024 x 1024 px and contains 16 cells arranged in a 4 x 4 grid, so each cell is 256 x 256 px.
 
-The add-on sets keyframe interpolation for `sprite_index` to `CONSTANT`.
+The preview in the material panel shows the first cell. At this point, the sprite sheet is selected, but it has not been connected to the material in the 3D Viewport yet.
 
-Sprite cells are calculated with floor division. For example, a 512 x 512 image with 50 x 50 cells becomes 10 columns x 10 rows. The 12 px remainder on the right and bottom edges is ignored, and valid indices are 0 through 99.
+To show it on the mesh, set up the shader nodes.
 
-## Notes
+<img width="960" height="629" alt="setup_nodes" src="https://github.com/user-attachments/assets/4cbc6116-f6a4-4242-aed2-c5f73132913a" />
 
-- Thumbnails are generated from Blender image pixels and cached for the active page.
-- Preview display is paged at up to 256 cells per page.
-- The panel uses Blender's icon view for the selected cell preview and tile picker.
-- The `Choose Cell` popup contains the page controls and the visible cell choices for the active thumbnail page.
-- Thumbnail caches are cleared automatically when the sprite sheet image, cell size, or page changes. A deferred sync also runs after image/cell changes so the initial preview value is initialized without extra navigation.
-- `sprite_index` is an internal animated property. Users pick cells from the thumbnail view instead of typing index numbers directly.
-- Keyframes are inserted only when `Insert Key` is pressed. Picking a cell does not create keyframes automatically.
-- The shader setup creates or reuses:
-  - `SPRITE_SHEET_IMAGE`
-  - `SPRITE_SHEET_UV`
-  - `Sprite Sheet UV` node group
+Click **Setup Nodes**. The add-on automatically adds the required nodes to the selected material's shader node graph.
 
-## UI Smoke Test
+The currently selected cell from the sprite sheet is now drawn on the mesh in the 3D Viewport. To see it in the viewport, use **Material Preview** or **Rendered** mode instead of **Solid** mode.
 
-Run this from the project root to open Blender, create a test material, show the Material Properties panel, and save a screenshot:
+You can freely change the rest of the shader node graph, except for the nodes highlighted in red in the screenshot.
 
-```sh
-make ui-smoke
-```
+Next, switch to a different cell.
 
-The screenshot is written to `ui_test_output/sprite_sheet_picker_panel.png`.
+<img width="960" height="596" alt="choose_cell" src="https://github.com/user-attachments/assets/8fb6a9d5-145b-4780-80c2-5e83b5155ab3" />
+
+Click **Choose Cell**. A popup window shows the sprite cells as tiles. Click **Select** on the cell you want to use.
+
+<img width="960" height="682" alt="cell_change" src="https://github.com/user-attachments/assets/3a515e8e-99fb-47e7-ae24-f1053c6ed451" />
+
+The node index value is updated automatically, and the mesh in the 3D Viewport changes to the selected cell.
+
+To animate cell changes, insert keyframes as you switch cells.
+
+<img width="960" height="589" alt="key_for_animation" src="https://github.com/user-attachments/assets/618f7608-258a-4ba6-ae47-5b1c9ea7dd11" />
+
+Click **Insert Key** to add a keyframe on the timeline.
+
+Move to another frame, choose another cell, then click **Insert Key** again. Repeating this creates an animation where the displayed sprite cell changes over time.
+
+## License
+
+Sprite Sheet Material Picker is released under the MIT License. See `LICENSE`.

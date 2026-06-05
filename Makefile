@@ -10,7 +10,7 @@ DIST_ZIP := $(DIST_DIR)/$(ADDON_NAME)-v$(VERSION).zip
 
 dist:
 	mkdir -p $(DIST_DIR)
-	zip -r -FS $(DIST_ZIP) $(ADDON_NAME) README.md CHANGELOG.md -x '*/__pycache__/*'
+	zip -r -FS $(DIST_ZIP) $(ADDON_NAME) README.md CHANGELOG.md LICENSE -x '*/__pycache__/*'
 
 print-version:
 	@printf '%s\n' $(VERSION)

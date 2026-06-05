@@ -16,6 +16,7 @@ from .utils import (
 class MATERIAL_OT_sprite_setup_nodes(bpy.types.Operator):
     bl_idname = "material.sprite_setup_nodes"
     bl_label = "Setup Nodes"
+    bl_description = "Create or update the material nodes needed to display the selected sprite sheet cell"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -32,6 +33,7 @@ class MATERIAL_OT_sprite_setup_nodes(bpy.types.Operator):
 class MATERIAL_OT_sprite_select_cell(bpy.types.Operator):
     bl_idname = "material.sprite_select_cell"
     bl_label = "Select Sprite Cell"
+    bl_description = "Switch this material to the selected sprite sheet cell"
     bl_options = {"REGISTER", "UNDO"}
 
     material_name: bpy.props.StringProperty()
@@ -53,6 +55,7 @@ class MATERIAL_OT_sprite_select_cell(bpy.types.Operator):
 class MATERIAL_OT_sprite_open_image(bpy.types.Operator, ImportHelper):
     bl_idname = "material.sprite_open_image"
     bl_label = "Open Sprite Sheet Image"
+    bl_description = "Load a sprite sheet image for the active material"
     bl_options = {"REGISTER", "UNDO"}
 
     filename_ext = ""
@@ -81,6 +84,7 @@ class MATERIAL_OT_sprite_open_image(bpy.types.Operator, ImportHelper):
 class MATERIAL_OT_sprite_pick_cell_popup(bpy.types.Operator):
     bl_idname = "material.sprite_pick_cell_popup"
     bl_label = "Pick Sprite Cell"
+    bl_description = "Open a thumbnail picker for choosing a sprite sheet cell"
     bl_options = {"REGISTER"}
 
     material_name: bpy.props.StringProperty()
@@ -193,6 +197,7 @@ class MATERIAL_OT_sprite_pick_cell_popup(bpy.types.Operator):
 class MATERIAL_OT_sprite_insert_key(bpy.types.Operator):
     bl_idname = "material.sprite_insert_key"
     bl_label = "Insert Key"
+    bl_description = "Insert a constant keyframe for the current sprite sheet cell on the active frame"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -209,6 +214,7 @@ class MATERIAL_OT_sprite_insert_key(bpy.types.Operator):
 class MATERIAL_OT_sprite_step_index(bpy.types.Operator):
     bl_idname = "material.sprite_step_index"
     bl_label = "Step Sprite Index"
+    bl_description = "Move the sprite sheet cell selection forward or backward"
     bl_options = {"REGISTER", "UNDO"}
 
     step: bpy.props.IntProperty(default=1)
@@ -232,6 +238,7 @@ class MATERIAL_OT_sprite_step_index(bpy.types.Operator):
 class MATERIAL_OT_sprite_set_preview_page(bpy.types.Operator):
     bl_idname = "material.sprite_set_preview_page"
     bl_label = "Set Sprite Preview Page"
+    bl_description = "Move the sprite sheet thumbnail preview to another page"
     bl_options = {"REGISTER"}
 
     step: bpy.props.IntProperty(default=1)

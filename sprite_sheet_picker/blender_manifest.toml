@@ -1,0 +1,14 @@
+schema_version = "1.0.0"
+
+id = "sprite_sheet_picker"
+version = "1.0.0"
+name = "Sprite Sheet Material Picker"
+tagline = "Pick sprite sheet cells and drive material UVs"
+maintainer = "lyokato <lyo.kato@gmail.com>"
+type = "add-on"
+
+tags = ["Material"]
+blender_version_min = "4.2.0"
+
+license = ["SPDX:MIT"]
+copyright = ["2026 lyokato"]
