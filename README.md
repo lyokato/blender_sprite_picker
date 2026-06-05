@@ -8,7 +8,7 @@ Tested with Blender 4.5 LTS and Blender 5.1.
 
 1. Run `make dist`, or point Blender at the folder during development.
 2. In Blender, open `Edit > Preferences > Add-ons > Install...`.
-3. Install `sprite_sheet_picker.zip`.
+3. Install `dist/sprite_sheet_picker-v<version>.zip`.
 4. Enable `Sprite Sheet Material Picker`.
 
 ## Development
@@ -19,7 +19,23 @@ make test
 make ui-smoke
 ```
 
+`make dist` reads the add-on version from `sprite_sheet_picker/__init__.py` and writes a versioned zip such as `dist/sprite_sheet_picker-v1.0.0.zip`.
+
 `make test` runs the background add-on tests with Blender 4.5 and 5.1. `make ui-smoke` opens Blender 4.5, creates a test material, shows the Material Properties panel, and saves a screenshot.
+
+## Release
+
+1. Update `bl_info["version"]` in `sprite_sheet_picker/__init__.py`.
+2. Update `CHANGELOG.md`.
+3. Commit the version bump and changelog.
+4. Create and push a matching tag:
+
+```sh
+git tag v1.0.0
+git push origin main --tags
+```
+
+Pushing a tag like `v1.0.0` runs the release workflow. GitHub creates a release for that tag and attaches the versioned zip from `make dist`.
 
 ## Basic Workflow
 
